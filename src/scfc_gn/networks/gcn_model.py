@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn.conv import GCNConv
+from torch_geometric.nn import global_mean_pool
 
 @dataclass(frozen=True)
 class ModelConfig:
@@ -33,13 +34,12 @@ class GCNModel(nn.Module):
         cfg: ModelConfig
     ):
         super().__init__()
-        in_channels = cfg.in_channels
-        self.convs = nn.Sequential(
-            GCNBlock(in_channels, int(in_channels/2), cfg.dropout),
-            GCNBlock(int(in_channels/2), in_channels, cfg.dropout)
-        )
+        n = cfg.in_channels
+        self.conv1 = GCNBlock(n, n, cfg.dropout)
+        self.conv2 = GCNBlock(n, n, cfg.dropout)
 
     
     def forward(self, x, edge_index, edge_attr=None):
-        x = self.convs(x, edge_index, edge_attr)
+        x = self.conv1(x, edge_index, edge_attr)
+        x = self.conv2(x, edge_index, edge_attr)
         return x

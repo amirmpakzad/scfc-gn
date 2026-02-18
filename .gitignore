@@ -2,3 +2,20 @@
 /venv/
 /runs/
 /.idea/
+
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Logs
+*.log
+runs/
+
+# OS
+.DS_Store

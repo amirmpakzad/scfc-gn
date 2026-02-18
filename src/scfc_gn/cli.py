@@ -1,10 +1,10 @@
 import torch
-from torch.utils.data import DataLoader
 from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader
 
 import typer
 from .config import load_config
-from scfc_gn.utils.logging import setup_logger, make_run_dir
+from scfc_gn.utils.loger import setup_logger, make_run_dir
 from scfc_gn.networks.gcn_model import GCNModel, ModelConfig
 from scfc_gn.train.loop import train_loop, TrainConfig
 from scfc_gn.ucla.load_data import get_all_subjects
@@ -32,10 +32,11 @@ def train(
         raise typer.Exit(code=1)
 
     data_list = []
+    n = len(subs[0].whole_data.matrices.sc_matrix)
     for item in subs:
         sc = torch.from_numpy(item.whole_data.matrices.sc_matrix)
         fc = torch.from_numpy(item.whole_data.matrices.fc_matrix)
-        n = sc.shape[0]
+
         I = torch.eye(n)
         edge_cfg = ConversionConfig(
             directed=False, 
@@ -43,10 +44,10 @@ def train(
             threshold=1e-6)
         edges = edge_index_from_connectivity(sc, config=edge_cfg)
         data = Data(
-            x=I,
-            edge_index=edges.edge_index,
-            edge_attr=edges.edge_attr,
-            y=fc)
+            x=I.float(),
+            edge_index=edges.edge_index.long(),
+            edge_attr=edges.edge_attr.float(),
+            y=fc.float())
 
         data_list.append(data)
 
@@ -54,7 +55,7 @@ def train(
 
     #get loader 
     dl = DataLoader(data_list, batch_size=cfg.train.batch_size, shuffle=True)
-    model = GCNModel(ModelConfig())
+    model = GCNModel(ModelConfig(in_channels=n))
     #train loop
     train_cfg = TrainConfig(
         epochs=cfg.train.epochs,

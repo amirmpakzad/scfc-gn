@@ -20,10 +20,10 @@ dataset:
     test: 0.1
 
 train:
-  epochs: 30
-  batch_size: 8
+  epochs: 1000
+  batch_size: 1
   num_workers: 8
   lr: 3e-4
   weight_decay: 1e-4
   grad_clip: 1.0
-  log_interval: 50
+  log_interval: 64

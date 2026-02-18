@@ -151,6 +151,8 @@ def get_subgraph(sc_mat, fc_mat, region_names, xyz, idx, type):
     mask = get_mask(sc_sub_net)
     sc_values = sc_sub_net[mask].astype(float)
     fc_values = fc_sub_net[mask].astype(float)
+
+
     features = Features(sc_upper = sc_values, fc_upper= fc_values)
     network_data = NetworkData(
         matrices= matrices,
