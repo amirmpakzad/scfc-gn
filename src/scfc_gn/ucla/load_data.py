@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import Sequence
 from pathlib import Path
-from .utils import read_lines_txt
+from .utils import read_lines_txt, get_files
 from .matrices import get_matrices, get_upper_tri
 from scfc_gn.corr.mutual_information import mi_test
 
@@ -18,11 +18,6 @@ __all__ = [
     "boxplot",
 ]
 
-dti_pattern = "data/*_DTI_connectivity_matrix_file.txt"
-fc_pattern  = "data/*_rsfMRI_connectivity_matrix_file.txt"
-xyz_pattern = "data/*_DTI_region_xyz_centers_file.txt"
-region_pattern = "data/*_DTI_region_names_full_file.txt"
-
 
 def get_subject_id(fn : str, remove_suff : bool = False):
     nm = fn.split("_")[0]
@@ -33,21 +28,13 @@ def get_subject_id(fn : str, remove_suff : bool = False):
     return s
 
 
-def get_file_maps(remove_suffix: bool= True):
-    dti_files, fc_files, xyz_files, region_files = get_files()
+def get_file_maps(pattern: FilePattern, remove_suffix: bool= True):
+    dti_files, fc_files, xyz_files, region_files = get_files(pattern)
     dti_map = {get_subject_id(f, remove_suffix): f for f in dti_files}
     fc_map = {get_subject_id(f, remove_suffix) : f for f in fc_files}
     xyz_map = {get_subject_id(f, remove_suffix): f for f in xyz_files}
     region_map = {get_subject_id(f, remove_suffix): f for f in region_files}
     return dti_map, fc_map, xyz_map, region_map
-
-
-def get_files():
-    dti_files = glob(dti_pattern)
-    fc_files = glob(fc_pattern)
-    xyz_files = glob(xyz_pattern)
-    region_files = glob(region_pattern)
-    return dti_files, fc_files, xyz_files, region_files
 
 
 
@@ -64,8 +51,8 @@ def get_subject_group_by_id(subject_id: str) -> SubjectGroup:
         raise ValueError(f"Unknown subject id prefix: {subject_id}")
     
 
-def get_subjects_map():
-    dti_map, fc_map, xyz_map, region_map = get_file_maps()
+def get_subjects_map(pattern: FilePattern):
+    dti_map, fc_map, xyz_map, region_map = get_file_maps(pattern)
     subjects = sorted(
         set(dti_map.keys()) &
         set(fc_map.keys()) &
@@ -84,8 +71,8 @@ def get_mask(sc_mat):
     return final_mask
 
 
-def get_all_subjects(remove_suffix: bool= True) -> Tuple[List[Subject], Subject]:
-    subjects = get_subjects_map()
+def get_all_subjects(pattern: FilePattern, remove_suffix: bool= True) -> Tuple[List[Subject], Subject]:
+    subjects = get_subjects_map(pattern)
     subjects_list = []
     group_subject = None
 
@@ -94,7 +81,7 @@ def get_all_subjects(remove_suffix: bool= True) -> Tuple[List[Subject], Subject]
 
         group = get_subject_group_by_id(id)
 
-        maps = get_file_maps(remove_suffix)
+        maps = get_file_maps(pattern, remove_suffix)
         files_path = FilesPaths(maps[0][id], maps[1][id], maps[2][id], maps[3][id])
         
         matrices = get_matrices(files_path)

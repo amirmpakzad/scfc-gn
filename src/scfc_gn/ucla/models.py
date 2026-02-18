@@ -2,7 +2,16 @@ from dataclasses import dataclass
 import numpy as np
 from enum import Enum
 
- 
+
+@dataclass(frozen=True)
+class FilePattern:
+    dti_files: str
+    fc_files: str
+    xyz_files: str
+    region_files: str
+
+
+
 @dataclass(frozen=True)
 class Matrices:
     fc_matrix: np.ndarray

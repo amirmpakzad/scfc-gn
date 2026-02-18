@@ -1,0 +1,29 @@
+run:
+  name: "experiment"
+  base_dir: "runs"
+  seed: 42
+  deterministic: false
+  splits_dir: "data/splits"   
+
+
+dataset:
+  root: "data/raw"  
+  file_pattern:
+    dti_pattern: "data/*_DTI_connectivity_matrix_file.txt"
+    fc_pattern: "data/*_rsfMRI_connectivity_matrix_file.txt"
+    xyz_pattern: "data/*_DTI_region_xyz_centers_file.txt"
+    region_pattern: "data/*_DTI_region_names_full_file.txt"
+
+  split:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+
+train:
+  epochs: 30
+  batch_size: 8
+  num_workers: 8
+  lr: 3e-4
+  weight_decay: 1e-4
+  grad_clip: 1.0
+  log_interval: 50

@@ -17,16 +17,14 @@ class GCNBlock(nn.Module):
         self, in_channels, out_channels, dropout,
     ):
         super().__init__()
-        self.gcn = GCNBlock(in_channels, out_channels)
+        self.gcn = GCNConv(in_channels, out_channels)
         self.dropout = nn.Dropout(p = dropout)
     
-    def forward(self, data):
-        x, edge_weight = data 
-        z = self.gcn(x)
+    def forward(self, x, edge_index, edge_attr=None):
+        z = self.gcn(x, edge_index, edge_attr)
         z = F.relu(z)
         z = self.dropout(z)
         return x + z
-
 
 
 class GCNModel(nn.Module):
@@ -42,6 +40,6 @@ class GCNModel(nn.Module):
         )
 
     
-    def forward(self, data):
-        x = self.convs(x, data)
+    def forward(self, x, edge_index, edge_attr=None):
+        x = self.convs(x, edge_index, edge_attr)
         return x
