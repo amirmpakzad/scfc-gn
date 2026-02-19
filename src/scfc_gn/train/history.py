@@ -1,9 +1,17 @@
 from __future__ import annotations
-
+from dataclasses import dataclass
 import json
 from dataclasses import is_dataclass, asdict
 from pathlib import Path
 from typing import Any, Dict
+
+
+@dataclass
+class TrainHistory:
+    epochs: list[int]
+    train_losses: list[float]
+    val_losses: list[float]
+
 
 class JsonlHistoryWriter:
     def __init__(self, path: str):
@@ -28,3 +36,18 @@ class JsonlHistoryWriter:
             rec[f"{prefix}_{k}"] = v
         self.log(rec)
 
+
+def get_history(path: str):
+    epochs = []
+    train_losses = []
+    val_losses = []
+
+    with open(path, "r") as f:
+        for line in f:
+            record = json.loads(line)
+            if record["type"] == "epoch":
+                epochs.append(record["epoch"])
+                train_losses.append(record["train_loss"])
+                val_losses.append(record["val_loss"])
+
+    return TrainHistory(epochs, train_losses, val_losses)

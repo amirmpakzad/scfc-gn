@@ -12,3 +12,5 @@ def get_files(pattern: FilePattern):
     xyz_files = glob.glob(pattern.xyz_files)
     region_files = glob.glob(pattern.region_files)
     return dti_files, fc_files, xyz_files, region_files
+
+

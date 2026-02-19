@@ -9,6 +9,7 @@ from pathlib import Path
 from .utils import read_lines_txt, get_files
 from .matrices import get_matrices, get_upper_tri
 from scfc_gn.corr.mutual_information import mi_test
+from scfc_gn.viz.boxplot import boxplot
 
 
 __all__ = [

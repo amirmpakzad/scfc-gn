@@ -117,3 +117,24 @@ if __name__ == "__main__":
     print("x edge_attr:\n", x_edges.edge_attr)
     print("y edge_index:\n", y_edges.edge_index)
     print("y edge_attr:\n", y_edges.edge_attr)
+
+
+def to_degree_matrix(
+    w: torch.Tensor,
+    threshold: float = None,
+    remove_self_loops: bool = True,
+) -> torch.Tensor:
+    if w.dim() != 2 or w.size(0) != w.size(1):
+        raise ValueError(f"Expected square weighted matrix, got {tuple(w.shape)}")
+
+    w_used = w.clone()
+
+    if threshold is not None:
+        w_used = torch.where(w_used >= threshold, w_used, torch.zeros_like(w_used))
+
+    if remove_self_loops:
+        w_used = w_used.clone()
+        w_used.fill_diagonal_(0)
+
+    deg = w_used.sum(dim=1)
+    return torch.diag(deg)
